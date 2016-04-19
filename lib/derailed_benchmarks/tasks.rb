@@ -88,7 +88,8 @@ namespace :perf do
       @app = Rack::MockRequest.new(DERAILED_APP)
 
       def call_app
-        response = @app.get(PATH_TO_HIT)
+        headers = ENV.keys.select{|key| key.starts_with?("HTTP_")}.inject({}) {|h, key| h[key] = ENV[key]; h}
+        response = @app.get(PATH_TO_HIT, headers)
         raise "Bad request: #{ response.body }" unless response.status == 200
         response
       end
